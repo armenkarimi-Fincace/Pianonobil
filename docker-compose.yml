@@ -1,0 +1,65 @@
+# The Piano Nobile — frontend, backend and PostgreSQL.
+#
+#   docker compose up --build
+#
+#   frontend  http://localhost:3000
+#   backend   http://localhost:8000        docs at /docs
+#   database  localhost:5432
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pianonobil}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pianonobil}
+      POSTGRES_DB: ${POSTGRES_DB:-pianonobil}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The backend must not start migrating before Postgres accepts connections.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pianonobil} -d ${POSTGRES_DB:-pianonobil}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-pianonobil}:${POSTGRES_PASSWORD:-pianonobil}@db:5432/${POSTGRES_DB:-pianonobil}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      SEED_ON_STARTUP: "1"
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # Migrations run to head on every start, then the API comes up. Seeding is
+    # idempotent, so this is safe to repeat.
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Inlined into the browser bundle at build time, so it must be the URL
+        # the browser can reach — not the compose service name.
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+    environment:
+      # Used by server components, which talk to the backend over the compose network.
+      API_BASE_URL: http://backend:8000
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:

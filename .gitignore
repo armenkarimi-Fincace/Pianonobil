@@ -1,0 +1,38 @@
+# ---- dependencies ----
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# ---- build output ----
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# ---- environment ----
+.env
+.env.*
+!.env.example
+
+# ---- tooling ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+.coverage
+htmlcov/
+
+# ---- editors / OS ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ---- logs ----
+*.log
+npm-debug.log*
+yarn-error.log*
