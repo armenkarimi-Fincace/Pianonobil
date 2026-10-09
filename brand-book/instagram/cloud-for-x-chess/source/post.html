@@ -1,0 +1,419 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Cloud for X-Chess</title>
+<style>
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-300-normal.woff2);font-weight:300}
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-500-normal.woff2);font-weight:500}
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-600-normal.woff2);font-weight:600}
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-700-normal.woff2);font-weight:700}
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-400-italic.woff2);font-weight:400;font-style:italic}
+@font-face{font-family:Mont;src:url(fonts/montserrat-latin-300-italic.woff2);font-weight:300;font-style:italic}
+@font-face{font-family:Corm;src:url(fonts/cormorant-garamond-latin-500-normal.woff2);font-weight:500}
+@font-face{font-family:Corm;src:url(fonts/cormorant-garamond-latin-700-normal.woff2);font-weight:700}
+@font-face{font-family:Corm;src:url(fonts/cormorant-garamond-latin-500-italic.woff2);font-weight:500;font-style:italic}
+@font-face{font-family:Hand;src:url(fonts/la-belle-aurore-latin-400-normal.woff2)}
+@font-face{font-family:Script;src:url(fonts/pinyon-script-latin-400-normal.woff2)}
+@font-face{font-family:Type;src:url(fonts/special-elite-latin-400-normal.woff2)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#777}
+#post{width:1080px;height:1350px;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 45% 40%,#f3ead8 0%,#ebdfc6 55%,#d9c8a6 100%)}
+#post>*{position:absolute}
+.grain{inset:0;width:1080px;height:1350px;pointer-events:none;z-index:40}
+.mont{font-family:Mont}
+h1{top:96px;left:0;right:0;text-align:center;font-family:Mont;font-weight:700;font-size:50px;letter-spacing:.02em;color:#1d1813}
+.sub{top:168px;left:0;right:0;text-align:center;font-family:Mont;font-style:italic;font-weight:400;font-size:25px;letter-spacing:.04em;color:#2b241d}
+.copy{top:226px;left:150px;width:620px;text-align:center;font-family:Corm;font-weight:500;font-size:29px;line-height:1.36;color:#2a221b}
+.copy b{font-weight:700}
+.hdr{top:60px;font-family:Mont;font-weight:500;font-size:15px;letter-spacing:.06em;color:#4a3f33}
+.hand{font-family:Hand;color:#4a3d30;white-space:nowrap}
+.script{font-family:Script;color:#3a2f25;white-space:nowrap}
+.type{font-family:Type;color:#2a221b}
+.lbl{font-family:Mont;font-weight:600;font-size:13px;letter-spacing:.16em;color:#3a2f25;white-space:nowrap;background:rgba(239,230,210,.85);padding:3px 7px;border:1px solid rgba(58,47,37,.45)}
+/* washi tape */
+.washi{height:34px;z-index:30;opacity:.88;box-shadow:0 1px 2px rgba(60,40,20,.15);
+  clip-path:polygon(0 6%,3% 0,6% 12%,9% 0,12% 8%,88% 4%,91% 12%,94% 0,97% 10%,100% 4%,98% 50%,100% 96%,96% 88%,93% 100%,90% 90%,10% 96%,7% 88%,4% 100%,0 92%,2% 50%)}
+.w1{background:repeating-linear-gradient(90deg,rgba(120,84,46,.55) 0 3px,transparent 3px 11px),linear-gradient(#e2cfa8,#d8c193)}
+.w2{background:radial-gradient(circle,rgba(110,78,44,.55) 1.4px,transparent 1.8px) 0 0/9px 9px,linear-gradient(#efe5cf,#e3d5b6)}
+.w3{background:repeating-linear-gradient(45deg,rgba(150,110,60,.38) 0 5px,transparent 5px 12px),linear-gradient(#e8dcc0,#dccaa2)}
+.tack{width:30px;height:30px;border-radius:50%;z-index:31;
+  background:radial-gradient(circle at 35% 30%,#fff6d8 0%,#e9c977 18%,#b08431 52%,#6e4e18 88%);
+  box-shadow:3px 5px 5px rgba(40,25,10,.45),inset -2px -3px 4px rgba(60,40,10,.5)}
+.print{background:#f4f1ea;padding:12px 12px 34px;box-shadow:4px 9px 18px rgba(50,35,20,.38),0 0 0 1px rgba(80,60,40,.15);z-index:20}
+.print svg{display:block;filter:grayscale(1) contrast(1.12) sepia(.18) brightness(.98)}
+.print .cap{position:absolute;bottom:8px;left:14px;font-family:Hand;font-size:17px;color:#3d3328}
+.note{z-index:22;box-shadow:3px 7px 14px rgba(50,35,20,.32)}
+.kraft{background:radial-gradient(ellipse at 30% 20%,#b8946a,#a07a4e 70%,#8f6b42);}
+.kraft::after,.paperw::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;opacity:.55;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/><feColorMatrix values='0 0 0 0 .45 0 0 0 0 .35 0 0 0 0 .22 0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.paperw{background:linear-gradient(170deg,#fbf9f4,#f0ebe0)}
+.deckle{clip-path:polygon(0 3%,5% 0,12% 2%,22% 0,35% 1.5%,50% 0,63% 2%,78% 0,90% 1.5%,100% 0,99% 25%,100% 50%,98.8% 75%,100% 100%,85% 98.5%,70% 100%,55% 98.2%,40% 100%,25% 98.6%,10% 100%,0 98%,1.2% 70%,0 45%,1% 20%)}
+/* 3D processor */
+#scene{left:200px;top:440px;width:680px;height:560px;perspective:2100px;z-index:10}
+#rig{position:absolute;left:340px;top:300px;transform-style:preserve-3d;transform:rotateX(55deg) rotateZ(-33deg)}
+.box{position:absolute;transform-style:preserve-3d}
+.box>div{position:absolute}
+.shadow{position:absolute;background:rgba(40,25,10,.55);filter:blur(22px);border-radius:30px}
+</style></head>
+<body>
+<div id="post">
+  <!-- faint engraved background drawings -->
+  <svg id="bgart" style="left:0;top:0;width:1080px;height:1350px;opacity:.16;z-index:1" viewBox="0 0 1080 1350"></svg>
+
+  <div class="hdr" style="left:96px">@XCHESS</div>
+  <div class="hdr" style="right:96px;top:60px">X&#8209;CHESS</div>
+
+  <svg id="cloud" style="left:880px;top:92px;width:160px;height:104px;z-index:12" viewBox="0 0 160 104"></svg>
+
+  <h1>CLOUD FOR X&#8209;CHESS</h1>
+  <div class="sub">THE ARCHITECTURE OF STRATEGY</div>
+  <div class="copy">How a <b>custom-engineered edge processing unit</b> brings global chess networks to the edge. <b>Every connection, every data flow</b>, hand&#8209;tuned for <b>peak performance</b>.</div>
+
+  <div class="hand" style="top:448px;left:34px;font-size:40px;transform:rotate(-8deg);color:#5a4a39">Architecture</div>
+  <div class="hand" style="top:494px;left:70px;font-size:36px;transform:rotate(-8deg);color:#5a4a39">de la stratégie</div>
+  <div class="hand" style="top:540px;left:120px;font-size:26px;transform:rotate(-8deg);color:#6b5a47">( edge compute )</div>
+
+  <!-- processor -->
+  <div id="scene"><div id="rig"></div></div>
+
+  <!-- top-right archive print: chessboard -->
+  <div class="print" style="left:806px;top:420px;transform:rotate(4deg)">
+    <svg id="board" width="232" height="196" viewBox="0 0 232 196"></svg>
+    <div class="cap">échiquier, c. 1890</div>
+  </div>
+  <div class="tack" style="left:910px;top:418px"></div>
+
+  <!-- notes -->
+  <div class="note kraft deckle" style="left:40px;top:640px;width:230px;height:200px;transform:rotate(-5deg);padding:26px 22px">
+    <div class="hand" style="position:relative;font-size:46px;color:#1f1812">Unit 01/50</div>
+    <div style="position:relative;height:1px;background:rgba(30,20,10,.5);margin:6px 0 14px"></div>
+    <div class="type" style="position:relative;font-size:21px;line-height:1.4;color:#1d1610">HAND-<br>ASSEMBLED</div>
+    <div class="hand" style="position:relative;font-size:19px;margin-top:8px;color:#2a1f15">— n° 01 of 50</div>
+  </div>
+  <div class="washi w1" style="left:92px;top:622px;width:130px;transform:rotate(-9deg)"></div>
+
+  <div class="note paperw" style="left:820px;top:752px;width:228px;height:210px;transform:rotate(3.5deg);padding:24px 22px">
+    <div class="type" style="position:relative;font-size:16.5px;line-height:1.45;letter-spacing:.02em">GLOBAL CHESS<br>ENGINE<br>INTEGRATION</div>
+    <div class="mont" style="position:relative;font-weight:300;font-size:31px;letter-spacing:0;margin-top:10px;color:#1d1813;white-space:nowrap">C-CORE V.3</div>
+    <div class="hand" style="position:relative;font-size:19px;margin-top:6px;color:#4a3d30">edge build, 9 Oct.</div>
+  </div>
+  <div class="washi w2" style="left:880px;top:738px;width:116px;transform:rotate(6deg)"></div>
+
+  <!-- bottom-left archive print: server room -->
+  <div class="print" style="left:44px;top:964px;transform:rotate(-3.5deg)">
+    <svg id="servers" width="300" height="214" viewBox="0 0 300 214"></svg>
+    <div class="cap">salle des machines, 1961</div>
+  </div>
+  <div class="tack" style="left:180px;top:960px"></div>
+
+  <!-- circuit detail magnifier -->
+  <svg id="detail" style="left:420px;top:1050px;width:190px;height:190px;z-index:12" viewBox="0 0 190 190"></svg>
+  <div class="script" style="left:426px;top:1240px;font-size:30px;transform:rotate(-4deg);color:#4a3d30;z-index:12">Détail du circuit</div>
+
+  <!-- callouts -->
+  <div class="hand" style="left:610px;top:1010px;font-size:25px;transform:rotate(-5deg);z-index:12;line-height:1.15">brass heat-spreader,<br>côtes de Genève</div>
+  <div class="hand" style="left:396px;top:978px;font-size:24px;transform:rotate(-4deg);z-index:12">brushed steel carrier</div>
+
+  <!-- signature -->
+  <div style="left:690px;top:1100px;width:350px;text-align:center;z-index:12">
+    <div class="mont" style="position:static;font-weight:500;font-size:13px;letter-spacing:.32em;color:#4a3f33">INVENIT ET FECIT</div>
+    <svg id="sig" style="position:static;display:block;margin:4px auto 0" width="330" height="120" viewBox="0 0 330 120"></svg>
+    <div class="mont" style="position:static;font-weight:600;font-size:14px;letter-spacing:.2em;color:#2a221b;margin-top:2px">THE NEXT ERA OF<br>INDEPENDENT STRATEGY</div>
+  </div>
+
+  <!-- diagram overlay -->
+  <svg id="diag" style="left:0;top:0;width:1080px;height:1350px;z-index:25;pointer-events:none" viewBox="0 0 1080 1350"></svg>
+  <div class="lbl" style="left:704px;top:520px;z-index:26;transform:rotate(-74deg);transform-origin:left top">EDGE SYNC</div>
+  <div class="lbl" style="left:770px;top:368px;z-index:26;transform:rotate(-63deg);transform-origin:left top">DATA FLOW</div>
+  <div class="lbl" style="left:897px;top:204px;z-index:26">GLOBAL CLOUD</div>
+
+  <svg class="grain" viewBox="0 0 1080 1350" style="mix-blend-mode:multiply">
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" seed="3"/><feColorMatrix values="0 0 0 0 .42 0 0 0 0 .34 0 0 0 0 .22 0 0 0 .32 0"/></filter>
+    <filter id="st"><feTurbulence type="fractalNoise" baseFrequency=".0035 .005" numOctaves="4" seed="11"/><feColorMatrix values="0 0 0 0 .6 0 0 0 0 .48 0 0 0 0 .3 0 0 0 .5 -.12"/></filter>
+    <linearGradient id="crease1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a6040" stop-opacity="0"/><stop offset=".48" stop-color="#7a6040" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity=".35"/><stop offset=".53" stop-color="#7a6040" stop-opacity="0"/></linearGradient>
+    <rect width="1080" height="1350" filter="url(#g)"/>
+    <rect width="1080" height="1350" filter="url(#st)"/>
+    <rect x="-200" y="0" width="80" height="1600" fill="url(#crease1)" opacity=".55" transform="rotate(-24 0 0) translate(640 -120)"/>
+    <rect x="0" y="0" width="60" height="1500" fill="url(#crease1)" transform="rotate(62 540 675) translate(560 -80)" opacity=".4"/>
+  </svg>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="logo" viewBox="0 0 100 100">
+      <path d="M16 16 L84 84 M84 16 L16 84" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
+      <g fill="currentColor" stroke="var(--gap,#000)" stroke-width="4" paint-order="stroke">
+        <rect x="47" y="6" width="6" height="20" rx="1"/><rect x="41" y="11" width="18" height="6" rx="1"/>
+        <path d="M33 34 Q50 24 67 34 L61 46 L39 46 Z"/>
+        <rect x="37" y="46" width="26" height="6" rx="2"/>
+        <path d="M41 52 C42 64 38 74 33 80 L67 80 C62 74 58 64 59 52 Z"/>
+        <rect x="28" y="80" width="44" height="7" rx="2"/><rect x="24" y="87" width="52" height="7" rx="2"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e};
+function rng(s){return()=>{s=(s*16807)%2147483647;return (s-1)/2147483646}}
+
+/* ============ 3D processor ============ */
+const rig=document.getElementById('rig');
+function box(w,d,h,z,faces,cx=0,cy=0){
+  const b=document.createElement('div');b.className='box';
+  b.style.cssText=`left:${cx-w/2}px;top:${cy-d/2}px;width:${w}px;height:${d}px;transform:translateZ(${z}px)`;
+  const f=(css,tf,origin)=>{const d0=document.createElement('div');d0.style.cssText=css+`;transform-origin:${origin};transform:${tf}`;b.appendChild(d0);return d0};
+  const top=f(`left:0;top:0;width:${w}px;height:${d}px;${faces.top}`,`translateZ(${h}px)`,'center');
+  f(`left:0;top:${d}px;width:${w}px;height:${h}px;${faces.front}`,'rotateX(90deg)','top center');
+  f(`left:${w}px;top:0;width:${h}px;height:${d}px;${faces.right}`,'rotateY(-90deg)','left center');
+  f(`left:0;top:${-h}px;width:${w}px;height:${h}px;${faces.back||faces.front}`,'rotateX(-90deg)','bottom center');
+  f(`left:${-h}px;top:0;width:${h}px;height:${d}px;${faces.left||faces.right}`,'rotateY(90deg)','right center');
+  rig.appendChild(b);return top;
+}
+const steelSide='background:linear-gradient(180deg,#9aa1a8,#5d636a 60%,#3f444a)';
+const steelSide2='background:linear-gradient(90deg,#c9ced3,#7d848b 55%,#565c62)';
+const brassSide='background:linear-gradient(180deg,#e7c97f,#a87d32 55%,#6f4f1b)';
+const brassSide2='background:linear-gradient(90deg,#f1d993,#b88b3c 50%,#7a5720)';
+
+// soft shadow on the paper
+const sh=document.createElement('div');sh.className='shadow';sh.style.cssText+='left:-250px;top:-230px;width:520px;height:520px;transform:translate(26px,30px)';rig.appendChild(sh);
+
+// base steel carrier with gold edge pins on the front/right faces
+const pins='repeating-linear-gradient(90deg,#3a3f44 0 5px,#e9cd7d 5px 9px,#a67c2e 9px 12px,#3a3f44 12px 16px)';
+const pinsV='repeating-linear-gradient(180deg,#3a3f44 0 5px,#e9cd7d 5px 9px,#a67c2e 9px 12px,#3a3f44 12px 16px)';
+const baseTop=box(460,460,26,0,{
+  top:`background:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,rgba(0,0,0,.05) 1px 2px),linear-gradient(135deg,#6f757c 0%,#e3e7ea 30%,#9ea5ac 50%,#eef1f3 66%,#7f868d 100%);border-radius:6px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),inset 0 0 0 3px rgba(40,45,50,.5)`,
+  front:`background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(0,0,0,.25)),${pins};border-top:3px solid #c3c8cd`,
+  right:`background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(0,0,0,.35)),${pinsV};border-left:3px solid #c3c8cd`,
+  back:steelSide,left:steelSide2});
+
+// base top-face artwork: circuitry, chips' legs, BGA dots, screws, engraving
+(function(){
+  const s=el('svg',{width:460,height:460,viewBox:'0 0 460 460',style:'position:absolute;inset:0'},baseTop);
+  const defs=el('defs',{},s);
+  const sg=el('radialGradient',{id:'screw',cx:'.38',cy:'.32',r:'.75'},defs);
+  [['0','#ffffff'],['.25','#d9dde1'],['.7','#7c838a'],['1','#3a3f44']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},sg));
+  const r=rng(42);
+  const g=el('g',{fill:'none','stroke-linecap':'round','stroke-linejoin':'round'},s);
+  // fine microscopic grid in the outer band
+  for(let y=14;y<446;y+=6) el('line',{x1:14,y1:y,x2:446,y2:y,stroke:'rgba(40,45,50,.07)','stroke-width':.6},g);
+  // traces routed from the core outward with 45° bends
+  const C0=105,C1=355; // core area
+  const traces=[];
+  for(let side=0;side<4;side++) for(let i=0;i<15;i++){
+    const t=C0+12+i*(C1-C0-24)/14; let pts;
+    const out=40+r()*50, bend=(r()-.5)*60, edge=24+r()*10;
+    if(side===0) pts=[[t,C0],[t,C0-out*.5],[t+bend,C0-out*.5-Math.abs(bend)],[t+bend,edge]];
+    if(side===1) pts=[[C1,t],[C1+out*.5,t],[C1+out*.5+Math.abs(bend),t+bend],[460-edge,t+bend]];
+    if(side===2) pts=[[t,C1],[t,C1+out*.5],[t+bend,C1+out*.5+Math.abs(bend)],[t+bend,460-edge]];
+    if(side===3) pts=[[C0,t],[C0-out*.5,t],[C0-out*.5-Math.abs(bend),t+bend],[edge,t+bend]];
+    traces.push(pts);
+  }
+  traces.forEach(p=>{const d='M'+p.map(q=>q.join(' ')).join(' L');
+    el('path',{d,stroke:'rgba(30,25,15,.55)','stroke-width':2.6,transform:'translate(.8 1)'},g);
+    el('path',{d,stroke:'#c49a4a','stroke-width':1.7},g);
+    el('path',{d,stroke:'rgba(255,240,200,.6)','stroke-width':.5,transform:'translate(-.3 -.3)'},g);
+    const e=p[p.length-1]; el('circle',{cx:e[0],cy:e[1],r:3.4,fill:'#d9b25e',stroke:'#5b4116','stroke-width':.8},g); el('circle',{cx:e[0],cy:e[1],r:1.2,fill:'#3a2c12'},g);
+  });
+  // BGA dot fields in corners
+  [[30,30],[358,30],[30,358],[358,358]].forEach(([x0,y0])=>{for(let i=0;i<9;i++)for(let j=0;j<9;j++) el('circle',{cx:x0+i*8,cy:y0+j*8,r:1.5,fill:'rgba(50,55,60,.55)'},g)});
+  // chip legs (chips themselves are 3D boxes)
+  const chips=[[230,62,'h'],[230,398,'h'],[62,230,'v'],[398,230,'v']];
+  chips.forEach(([x,y,o])=>{for(let k=-6;k<=6;k++){ if(o==='h'){el('rect',{x:x+k*7-1.5,y:y-22,width:3,height:44,fill:'#d6b462',stroke:'#6a4c18','stroke-width':.4},g)} else {el('rect',{x:x-22,y:y+k*7-1.5,width:44,height:3,fill:'#d6b462',stroke:'#6a4c18','stroke-width':.4},g)}}});
+  // screws
+  [[26,26],[434,26],[26,434],[434,434]].forEach(([x,y])=>{el('circle',{cx:x+1,cy:y+2,r:11,fill:'rgba(0,0,0,.35)'},g);el('circle',{cx:x,cy:y,r:10.5,fill:'url(#screw)',stroke:'#3a3f44','stroke-width':.8},g);el('line',{x1:x-8,y1:y-3,x2:x+8,y2:y+3,stroke:'#2a2e33','stroke-width':2.4},g)});
+  // engraving
+  const t=el('text',{x:230,y:452,'text-anchor':'middle','font-family':'Mont','font-weight':600,'font-size':10,'letter-spacing':'3',fill:'rgba(40,45,50,.75)'},s);t.textContent='X-CHESS · EDGE UNIT 01/50 · HAND-ASSEMBLED';
+  const t2=el('text',{x:452,y:230,'text-anchor':'middle','font-family':'Mont','font-weight':600,'font-size':10,'letter-spacing':'3',fill:'rgba(40,45,50,.75)',transform:'rotate(90 452 230)'},s);t2.textContent='C-CORE V.3 · CLOUD';
+})();
+
+// black ceramic chips on the carrier
+const chipTop='background:linear-gradient(135deg,#1c1d1f,#4a4d52 40%,#141516 60%,#2c2e31);border-radius:2px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)';
+const chipSide='background:#0e0f10';
+[[0,-168,92,30],[0,168,92,30],[-168,0,30,92],[168,0,30,92]].forEach(([x,y,w,d])=>box(w,d,7,26,{top:chipTop,front:chipSide,right:chipSide},x,y));
+
+// brass heat-spreader with côtes de Genève + engraved logo medallion
+const brassTop=box(240,240,24,26,{
+  top:`background:linear-gradient(135deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,0) 35%,rgba(0,0,0,.18) 70%,rgba(255,255,255,.2) 100%),repeating-linear-gradient(-35deg,#b8893c 0px,#f4dc9a 10px,#c79a4b 19px,#a77a30 21px);border-radius:4px;box-shadow:inset 0 0 0 2px rgba(255,240,200,.6),inset 0 0 0 4px rgba(90,60,20,.45)`,
+  front:brassSide,right:brassSide2});
+(function(){
+  const s=el('svg',{width:240,height:240,viewBox:'0 0 240 240',style:'position:absolute;inset:0'},brassTop);
+  const defs=el('defs',{},s);
+  const pg=el('radialGradient',{id:'pol',cx:'.35',cy:'.3',r:'.8'},defs);
+  [['0','#ffffff'],['.3','#e6eaee'],['.65','#9aa2aa'],['1','#4f565d']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},pg));
+  // perlage ring
+  for(let a=0;a<24;a++){const t=a*Math.PI/12;const x=120+86*Math.cos(t),y=120+86*Math.sin(t);el('circle',{cx:x,cy:y,r:7,fill:'none',stroke:'rgba(110,75,25,.35)','stroke-width':1},s);el('circle',{cx:x,cy:y,r:3,fill:'none',stroke:'rgba(255,240,200,.5)','stroke-width':.8},s)}
+  el('circle',{cx:121,cy:122,r:56,fill:'rgba(60,40,10,.5)'},s);
+  el('circle',{cx:120,cy:120,r:55,fill:'url(#pol)',stroke:'#6e4f1c','stroke-width':2},s);
+  el('circle',{cx:120,cy:120,r:48,fill:'none',stroke:'rgba(60,65,70,.5)','stroke-width':1},s);
+  const u=el('use',{href:'#logo',x:78,y:76,width:84,height:84,style:'color:#1e2226;--gap:#d7dce0'},s);
+  const u2=el('use',{href:'#logo',x:83,y:81,width:72,height:72,style:'color:rgba(255,255,255,.35);--gap:transparent',opacity:.0},s);
+  const t=el('text',{x:120,y:30,'text-anchor':'middle','font-family':'Mont','font-weight':700,'font-size':12,'letter-spacing':'4',fill:'rgba(80,55,15,.85)'},s);t.textContent='C-CORE V.3';
+  const t2=el('text',{x:120,y:222,'text-anchor':'middle','font-family':'Mont','font-weight':600,'font-size':10,'letter-spacing':'3',fill:'rgba(80,55,15,.85)'},s);t2.textContent='Nº 01 / 50';
+})();
+
+/* ============ cloud icon ============ */
+(function(){
+  const s=document.getElementById('cloud');
+  const defs=el('defs',{},s);const lg=el('linearGradient',{id:'cg',x1:0,y1:0,x2:1,y2:1},defs);
+  [['0','#f2dc9c'],['.5','#b68a3c'],['1','#7a5720']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},lg));
+  const d='M38 86 C14 86 8 62 26 54 C22 32 48 22 62 36 C70 12 108 10 114 38 C138 34 152 56 140 72 C150 86 132 92 122 86 Z';
+  el('path',{d,fill:'rgba(182,138,60,.18)',stroke:'#3a2f25','stroke-width':1.6},s);
+  el('path',{d,fill:'none',stroke:'url(#cg)','stroke-width':1,transform:'translate(5 5) scale(.94)',opacity:.9},s);
+  const nodes=[[46,66],[72,52],[98,62],[120,52],[84,76],[58,80],[110,78]];
+  [[0,1],[1,2],[2,3],[1,4],[4,2],[0,5],[5,4],[4,6],[6,2]].forEach(([a,b])=>el('line',{x1:nodes[a][0],y1:nodes[a][1],x2:nodes[b][0],y2:nodes[b][1],stroke:'#5a4630','stroke-width':.9},s));
+  nodes.forEach(([x,y],i)=>el('circle',{cx:x,cy:y,r:i===1?5:3.4,fill:i===1?'url(#cg)':'#efe5cf',stroke:'#3a2f25','stroke-width':1},s));
+})();
+
+/* ============ archive print: chessboard ============ */
+(function(){
+  const s=document.getElementById('board');
+  const defs=el('defs',{},s);
+  const f=el('filter',{id:'wood',x:0,y:0,width:1,height:1},defs);
+  el('feTurbulence',{type:'fractalNoise',baseFrequency:'0.012 0.32',numOctaves:3,seed:5},f);
+  el('feColorMatrix',{values:'0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'},f);
+  el('feComposite',{in2:'SourceGraphic',operator:'in'},f);
+  const vg=el('radialGradient',{id:'vig',cx:'.5',cy:'.45',r:'.75'},defs);
+  [['.55','rgba(0,0,0,0)'],['1','rgba(0,0,0,.65)']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},vg));
+  const pg=el('linearGradient',{id:'pc',x1:0,y1:0,x2:1,y2:0},defs);[['0','#1a1a1a'],['.35','#8a8a8a'],['.55','#3a3a3a'],['1','#0c0c0c']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},pg));
+  const pl=el('linearGradient',{id:'pl',x1:0,y1:0,x2:1,y2:0},defs);[['0','#8f8f8f'],['.35','#f5f5f5'],['.6','#c8c8c8'],['1','#6c6c6c']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},pl));
+  el('rect',{width:232,height:196,fill:'#2a2a2a'},s);
+  // background: dark room gradient
+  const bgG=el('linearGradient',{id:'bgG',x1:0,y1:0,x2:0,y2:1},defs);[['0','#151515'],['1','#3b3b3b']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},bgG));
+  el('rect',{width:232,height:70,fill:'url(#bgG)'},s);
+  const P=(X,Z)=>{const f=230, H=2.6; return [120+X*f/Z, 22+H*f/Z]};
+  const quad=(x0,z0,x1,z1)=>[P(x0,z0),P(x1,z0),P(x1,z1),P(x0,z1)].map(p=>p.join(',')).join(' ');
+  // ornate frame of board
+  el('polygon',{points:quad(-7.2,13.2,2.8,3.2),fill:'#5a5a5a'},s);
+  el('polygon',{points:quad(-6.6,12.6,2.2,3.6),fill:'#2e2e2e'},s);
+  for(let k=0;k<30;k++){const x=-6.4+k*0.3; el('polygon',{points:quad(x,12.55,x+0.15,12.25),fill:'#9a9a9a'},s)}
+  const board=el('g',{},s);
+  for(let i=0;i<8;i++)for(let j=0;j<8;j++){
+    const X=-6+i, Z=12-j; el('polygon',{points:quad(X,Z,X+1,Z-1),fill:(i+j)%2?'#d9d9d9':'#5c5c5c'},board);
+  }
+  el('polygon',{points:quad(-6,12,2,4),fill:'#777',filter:'url(#wood)',opacity:.85},s);
+  // pieces
+  function piece(X,Z,kind,col){const [x,y]=P(X,Z);const k=230/Z/27; const g=el('g',{transform:`translate(${x} ${y}) scale(${k})`},s);
+    el('ellipse',{cx:4,cy:2,rx:20,ry:6,fill:'rgba(0,0,0,.55)'},g);
+    const F=col==='w'?'url(#pl)':'url(#pc)';
+    if(kind==='king'){el('path',{d:'M-17 0 L17 0 L15 -7 L-15 -7 Z M-13 -7 C-10 -24 -8 -40 -6 -52 L6 -52 C8 -40 10 -24 13 -7 Z M-11 -52 L11 -52 L9 -58 L-9 -58 Z M-9 -58 Q0 -70 9 -58 Z M-2 -64 L2 -64 L2 -76 L-2 -76 Z M-6 -72 L6 -72 L6 -68 L-6 -68 Z',fill:F,stroke:'#111','stroke-width':.8},g)}
+    if(kind==='knight'){el('path',{d:'M-15 0 L15 0 L13 -7 L-13 -7 Z M-11 -7 C-12 -20 -4 -28 -2 -36 C-10 -34 -16 -36 -16 -42 C-12 -50 -4 -58 4 -60 L6 -66 L10 -58 C18 -50 16 -30 11 -7 Z',fill:F,stroke:'#111','stroke-width':.8},g)}
+    if(kind==='pawn'){el('path',{d:'M-13 0 L13 0 L11 -6 L-11 -6 Z M-9 -6 C-6 -16 -4 -22 -4 -28 L4 -28 C4 -22 6 -16 9 -6 Z M-7 -28 L7 -28 L5 -31 L-5 -31 Z',fill:F,stroke:'#111','stroke-width':.8},g);el('circle',{cx:0,cy:-37,r:7,fill:F,stroke:'#111','stroke-width':.8},g)}
+  }
+  piece(-4.5,10.5,'pawn','b'); piece(-0.5,10.5,'knight','b'); piece(-1.5,9.5,'king','b'); piece(-3.5,7.5,'pawn','w'); piece(-0.5,6.5,'king','w');
+  el('rect',{width:232,height:196,fill:'url(#vig)'},s);
+  // film grain
+  const gf=el('filter',{id:'pg'},defs);el('feTurbulence',{type:'fractalNoise',baseFrequency:1.2,numOctaves:2,seed:9},gf);el('feColorMatrix',{values:'0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .35 0'},gf);
+  el('rect',{width:232,height:196,filter:'url(#pg)'},s);
+  el('rect',{width:232,height:196,fill:'rgba(120,100,70,.08)'},s);
+})();
+
+/* ============ archive print: early server room ============ */
+(function(){
+  const s=document.getElementById('servers');
+  const defs=el('defs',{},s);
+  const f=110, VX=150, VY=96;
+  const P=(X,Y,Z)=>[VX+X*f/Z, VY-Y*f/Z];
+  const pt=a=>a.map(p=>p.join(',')).join(' ');
+  el('rect',{width:300,height:214,fill:'#9a9a9a'},s);
+  // ceiling & floor
+  el('polygon',{points:pt([[0,0],[300,0],P(2.4,1.5,11),P(-2.4,1.5,11)]),fill:'#cfcfcf'},s);
+  el('polygon',{points:pt([[0,214],[300,214],P(2.4,-1.25,11),P(-2.4,-1.25,11)]),fill:'#6e6e6e'},s);
+  // floor tiles
+  for(let x=-2.4;x<=2.4;x+=0.6) el('line',{x1:P(x,-1.25,1.1)[0],y1:P(x,-1.25,1.1)[1],x2:P(x,-1.25,11)[0],y2:P(x,-1.25,11)[1],stroke:'rgba(30,30,30,.4)','stroke-width':.7},s);
+  for(let z=1.2;z<11;z*=1.18){const a=P(-2.4,-1.25,z),b=P(2.4,-1.25,z);el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'rgba(30,30,30,.4)','stroke-width':.7},s)}
+  // ceiling lights
+  for(let z=1.6;z<11;z*=1.35){el('polygon',{points:pt([P(-0.5,1.5,z),P(0.5,1.5,z),P(0.5,1.5,z*1.12),P(-0.5,1.5,z*1.12)]),fill:'#fafafa'},s)}
+  // far wall
+  el('polygon',{points:pt([P(-2.4,1.5,11),P(2.4,1.5,11),P(2.4,-1.25,11),P(-2.4,-1.25,11)]),fill:'#b5b5b5'},s);
+  // cabinets on both walls
+  [-2.4,2.4].forEach(X=>{
+    for(let z=1.15;z<10.5;z+=1.05){
+      const z2=z+0.95, top=0.95, bot=-1.25;
+      el('polygon',{points:pt([P(X,top,z),P(X,top,z2),P(X,bot,z2),P(X,bot,z)]),fill:'#3d3d3d',stroke:'#111','stroke-width':.6},s);
+      // panel face
+      const zc=(z+z2)/2;
+      // tape reels
+      [0.55,0.05].forEach(yc=>{[z+0.27,z+0.68].forEach(zz=>{const c=P(X,yc,zz);const r=0.19*f/zz;el('ellipse',{cx:c[0],cy:c[1],rx:r*0.45,ry:r,fill:'#d8d8d8',stroke:'#111','stroke-width':.5},s);el('ellipse',{cx:c[0],cy:c[1],rx:r*0.16,ry:r*.36,fill:'#333'},s)})});
+      // light panel row
+      for(let k=0;k<6;k++){const c=P(X,-0.35,z+0.12+k*0.13);el('circle',{cx:c[0],cy:c[1],r:Math.max(.6,7/zz(z)),fill:k%2?'#f2f2f2':'#777'},s)}
+      // lower doors
+      el('polygon',{points:pt([P(X,-0.55,z+0.08),P(X,-0.55,z2-0.08),P(X,-1.15,z2-0.08),P(X,-1.15,z+0.08)]),fill:'#575757',stroke:'#1b1b1b','stroke-width':.4},s);
+      // top face of cabinet
+      const inner=X<0?X+0.55:X-0.55;
+      el('polygon',{points:pt([P(X,top,z),P(X,top,z2),P(inner,top,z2),P(inner,top,z)]),fill:'#8a8a8a'},s);
+      el('polygon',{points:pt([P(inner,top,z),P(inner,top,z2),P(inner,bot,z2),P(inner,bot,z)]),fill:'#4a4a4a',stroke:'#111','stroke-width':.5},s);
+    }
+  });
+  function zz(z){return z}
+  // operator console in the middle distance
+  el('polygon',{points:pt([P(-0.6,-0.5,5.5),P(0.6,-0.5,5.5),P(0.6,-1.25,5.5),P(-0.6,-1.25,5.5)]),fill:'#2c2c2c'},s);
+  el('polygon',{points:pt([P(-0.6,-0.5,5.5),P(0.6,-0.5,5.5),P(0.6,-0.5,6.2),P(-0.6,-0.5,6.2)]),fill:'#9d9d9d'},s);
+  const vg=el('radialGradient',{id:'vg2',cx:'.5',cy:'.45',r:'.75'},defs);[['.5','rgba(0,0,0,0)'],['1','rgba(0,0,0,.6)']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},vg));
+  el('rect',{width:300,height:214,fill:'url(#vg2)'},s);
+  const gf=el('filter',{id:'pg2'},defs);el('feTurbulence',{type:'fractalNoise',baseFrequency:1.1,numOctaves:2,seed:3},gf);el('feColorMatrix',{values:'0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .38 0'},gf);
+  el('rect',{width:300,height:214,filter:'url(#pg2)'},s);
+  // scratches
+  const r=rng(7);for(let i=0;i<6;i++){const x=r()*300;el('line',{x1:x,y1:0,x2:x+r()*8-4,y2:214,stroke:'rgba(255,255,255,.18)','stroke-width':.5},s)}
+})();
+
+/* ============ magnified circuit detail ============ */
+(function(){
+  const s=document.getElementById('detail');
+  const defs=el('defs',{},s);
+  const cp=el('clipPath',{id:'dc'},defs);el('circle',{cx:95,cy:95,r:78},cp);
+  const sg=el('linearGradient',{id:'ds',x1:0,y1:0,x2:1,y2:1},defs);[['0','#7a8087'],['.4','#e3e7ea'],['.7','#9ea5ac'],['1','#6f757c']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},sg));
+  const g=el('g',{'clip-path':'url(#dc)'},s);
+  el('rect',{width:190,height:190,fill:'url(#ds)'},g);
+  for(let y=0;y<190;y+=4)el('line',{x1:0,y1:y,x2:190,y2:y,stroke:'rgba(40,45,50,.08)','stroke-width':.6},g);
+  const r=rng(19);
+  for(let i=0;i<9;i++){const y=20+i*18;const b=50+r()*80;const d=`M0 ${y} L${b} ${y} L${b+16} ${y+16} L190 ${y+16}`;
+    el('path',{d,stroke:'rgba(30,25,15,.5)','stroke-width':5,fill:'none',transform:'translate(1 1.5)'},g);el('path',{d,stroke:'#c49a4a','stroke-width':3.4,fill:'none'},g);
+    el('circle',{cx:b,cy:y,r:5,fill:'#d9b25e',stroke:'#5b4116','stroke-width':1},g);el('circle',{cx:b,cy:y,r:1.8,fill:'#3a2c12'},g)}
+  el('circle',{cx:95,cy:95,r:78,fill:'none',stroke:'#2a221b','stroke-width':3},s);
+  el('circle',{cx:95,cy:95,r:84,fill:'none',stroke:'#2a221b','stroke-width':1},s);
+})();
+
+/* ============ signature ============ */
+(function(){
+  const s=document.getElementById('sig');
+  el('use',{href:'#logo',x:8,y:28,width:56,height:56,style:'color:#2a221b;--gap:#ece2cb'},s);
+  const t=el('text',{x:190,y:78,'text-anchor':'middle','font-family':'Script','font-size':76,fill:'#1f1812'},s);t.textContent='X-Chess';
+  el('path',{d:'M84 96 C150 84 230 82 318 92 C250 90 170 96 120 108',stroke:'#1f1812','stroke-width':1.6,fill:'none','stroke-linecap':'round'},s);
+})();
+
+/* ============ faint engraved background ============ */
+(function(){
+  const s=document.getElementById('bgart');
+  const g=el('g',{fill:'none',stroke:'#3a2c1c','stroke-width':1.1},s);
+  // large gear bottom-right
+  const cx=990,cy=1300,R=230;
+  for(let a=0;a<48;a++){const t=a*Math.PI/24,t2=t+Math.PI/48;el('path',{d:`M${cx+R*Math.cos(t)} ${cy+R*Math.sin(t)} L${cx+(R+18)*Math.cos(t+.01)} ${cy+(R+18)*Math.sin(t+.01)} L${cx+(R+18)*Math.cos(t2)} ${cy+(R+18)*Math.sin(t2)} L${cx+R*Math.cos(t2+.01)} ${cy+R*Math.sin(t2+.01)}`},g)}
+  [R,R-30,R-110,60].forEach(r=>el('circle',{cx,cy,r},g));
+  for(let a=0;a<6;a++){const t=a*Math.PI/3;el('line',{x1:cx+60*Math.cos(t),y1:cy+60*Math.sin(t),x2:cx+(R-30)*Math.cos(t),y2:cy+(R-30)*Math.sin(t)},g)}
+  // engineering frame top-left
+  el('path',{d:'M30 120 L30 30 L120 30'},g);el('path',{d:'M44 120 L44 44 L120 44'},g);
+  for(let i=0;i<8;i++)el('line',{x1:30,y1:40+i*10,x2:36,y2:40+i*10},g);
+  // faint circuit lines behind processor
+  const r=rng(3);
+  for(let i=0;i<14;i++){const y=520+i*34;const x=r()*120;el('path',{d:`M${x} ${y} L${x+60} ${y} L${x+80} ${y+20} L${x+150} ${y+20}`,'stroke-width':.8},g);el('circle',{cx:x+150,cy:y+20,r:3},g)}
+})();
+
+/* ============ diagram lines ============ */
+(function(){
+  const s=document.getElementById('diag');
+  const g=el('g',{fill:'none',stroke:'#2e251c','stroke-width':1.3},s);
+  const arrow=(x,y,ang)=>{const L=11;el('path',{d:`M${x-L*Math.cos(ang-.4)} ${y-L*Math.sin(ang-.4)} L${x} ${y} L${x-L*Math.cos(ang+.4)} ${y-L*Math.sin(ang+.4)}`},g)};
+  // EDGE SYNC: from processor corner up to junction
+  el('path',{d:'M712 630 C 730 540 742 460 760 400'},g); arrow(760,400,-1.25);
+  el('circle',{cx:712,cy:630,r:5,fill:'#2e251c'},s);
+  // DATA FLOW: twin lines up to the cloud, opposite arrows
+  el('path',{d:'M765 392 C 800 320 850 250 905 196','stroke-dasharray':'6 5'},g); arrow(905,196,-0.78);
+  el('path',{d:'M921 206 C 866 262 818 330 782 404','stroke-dasharray':'2 5'},g); arrow(782,404,2.0);
+  el('circle',{cx:765,cy:396,r:6,fill:'#efe5cf',stroke:'#2e251c'},s);
+})();
+
+document.fonts.ready.then(()=>setTimeout(()=>document.body.dataset.ready='1',200));
+</script>
+</body></html>
